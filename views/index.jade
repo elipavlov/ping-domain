@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  form(name="checkUrl")
+    button(id="check") Проверить
+    input(type="text" id="url" size="20" name="url")
+  pre(id="res")

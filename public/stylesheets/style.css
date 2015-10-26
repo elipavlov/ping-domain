@@ -1,0 +1,18 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+input[name="url"] {
+  margin-left:10px;
+  text-align:center;
+}
+#res {
+  max-width: 100%;
+  padding-top: 8px;
+  margin-top: 10px;
+  border-top: 1px solid #ccc;
+}
