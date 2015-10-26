@@ -6,17 +6,20 @@ var router = express.Router();
 
 /* GET home page. */
 
-router.isWin = 'win32' == process.platform || 'win64' == process.platform;
+router.isWin = 'win32' == process.platform;
 
 router.get('/', function (req, res, next) {
     var qurl = url.parse(req.url, true);
 
     if (qurl.query != undefined && qurl.query.url != undefined) {
         if (qurl.query.url.trim().length > 0) {
+
+            //module.exports['super'].argv
+            var child;
             if (router.isWin) {
-                var child = spawn('ping', [qurl.query.url, '-n', '1']);
+                child = spawn('ping', [qurl.query.url, '-n', 1]);
             } else {
-                var child = spawn('ping', [qurl.query.url, '-c', '1']);
+                child = spawn('ping', [qurl.query.url, '-c', 1]);
             }
             var result = '';
 
@@ -24,14 +27,15 @@ router.get('/', function (req, res, next) {
             child.stdout.on('data', function (chunk) {
                 var buf = chunk;
                 if (router.isWin)
-                    buf = encoding.convert(buf, 'OEM', 'utf-8');
+                    buf = encoding.convert(buf, 'utf-8', '866');
 
                 result += buf.toString();
             });
             child.stderr.on('data', function (chunk) {
                 var buf = chunk;
                 if (router.isWin)
-                    buf = encoding.convert(buf, 'OEM', 'utf-8');
+                    buf = encoding.convert(buf, 'utf-8', '866');
+
                 result += buf.toString();
             });
 

@@ -12,8 +12,11 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+app.debug = debug;
+Object.defineProperty(app, 'argv', {enumerable:true, value: getArgvParams()});
+Object.defineProperty(app, 'port', {enumerable:true, value: normalizePort(app.argv.port || process.env.PORT || '3000')});
+
+//console.log(app);
 
 /**
  * Create HTTP server.
@@ -24,8 +27,7 @@ var server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-
-server.listen(port);
+server.listen(app.port);
 server.on('error', onError);
 server.on('listening', onListening);
 
@@ -47,6 +49,43 @@ function normalizePort(val) {
   }
 
   return false;
+}
+
+function getArgvParams() {
+  var res = {};
+  var lastName = '_paths';
+  process.argv.forEach(function(val, ind){
+    if (0 == val.trim().indexOf('-')) {
+      lastName = val.trim().replace(/^(-*)/, '');
+
+      //debug('lastName', lastName);
+      if (lastName.length == 0)
+        return true;
+
+      if (process.argv[ind+1] && 0 != process.argv[ind+1].trim().indexOf('-')) {
+        return true;
+      } else {
+        if (0 == lastName.indexOf('no-')) {
+          Object.defineProperty(res, lastName.substr(3), {value: false, enumerable: true});
+        } else
+          Object.defineProperty(res, lastName, {value: true, enumerable: true});
+      }
+    } else {
+      if (!lastName.length)
+        return true;
+
+      var q = res[lastName];
+      if (q == undefined) {
+        res[lastName] = val;
+      } else if (Array.isArray(q)) {
+        res[lastName].push(val);
+      } else {
+        res[lastName] = [q, val];
+      }
+    }
+  });
+
+  return res;
 }
 
 /**
@@ -86,5 +125,6 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
+
   debug('Listening on ' + bind);
 }
